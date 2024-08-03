@@ -174,9 +174,10 @@ call countSalesmanWithCondition();
 Delimiter $$
 create procedure totalSales(IN salesman_id varchar(15))
 Begin 
-select count(so.Order_Number) as total_sales from salesman ss join salesorder so
-on ss.Salesman_Number = so.Salesman_Number
-where ss.Salesman_Number = salesman_id
+select sum(sod.Order_Quality) as total_sales 
+from salesorder so join salesorderdetails sod
+on so.Order_Number = sod.Order_Number
+where so.Salesman_Number = salesman_id
 group by so.Salesman_Number;
 End$$
 Delimiter ;
@@ -204,7 +205,12 @@ call addNewProduct('P1009','Cucumber',10,30,1100,850,40,null,10);
 -- Greater than or equal to 5000: "Midium"
 -- Less than 5000: "Small"
 Delimiter $$
-create procedure calculatingOrder()
+create procedure calculatingOrder(
+    IN p_Order_Number INT,
+    OUT p_TotalValue DECIMAL(15, 2),
+    OUT p_OrderStatus VARCHAR(10)
+)
+
 Begin
 
 End$$
