@@ -82,14 +82,14 @@ drop procedure get_clients_by_city;
 -- 13. Create a stored procedure to update the delivery status for a given order number. Change value
 -- delivery status of order number “O20006” and “O20008” to “On Way”.
 Delimiter $$
-create procedure updateDeliveryStatus()
+create procedure updateDeliveryStatus(IN order_id varchar(15))
 Begin
 update salesorder
 set Delivery_Status = 'On Way'
-where Order_Number = 'O20006' or Order_Number = 'O20008';
+where Order_Number = order_id;
 End$$
 Delimiter ;
-call updateDeliveryStatus();
+call updateDeliveryStatus('O20006');
 -- 14. Create a stored procedure to retrieve the total quantity for each product.
 Delimiter $$
 create procedure reportQuantity()
