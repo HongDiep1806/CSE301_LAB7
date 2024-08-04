@@ -206,14 +206,37 @@ call addNewProduct('P1009','Cucumber',10,30,1100,850,40,null,10);
 -- Less than 5000: "Small"
 Delimiter $$
 create procedure calculatingOrder(
-    IN p_Order_Number INT,
+    IN p_Order_Number varchar(50),
     OUT p_TotalValue DECIMAL(15, 2),
     OUT p_OrderStatus VARCHAR(10)
 )
-
 Begin
-
+declare done bool default false;
+declare cur cursor for select sod.Order_Quality* p.Sell_Price,
+case
+when sod.Order_Quality* p.Sell_Price > 10000 or sod.Order_Quality* p.Sell_Price = 10000 then 'Large'
+when sod.Order_Quality* p.Sell_Price > 5000 or sod.Order_Quality* p.Sell_Price = 5000 then 'Medium'
+else 'Small'
+end as orderStatus
+from salesorderdetails sod join salesorder so 
+on sod.Order_Number = so.Order_Number
+join product p 
+on p.Product_Number = sod.Product_Number
+where so.Order_Number = p_Order_Number ;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = true;
+OPEN cur;
+set p_TotalValue =0;
+set p_OrderStatus ='';
+processOrder : loop
+FETCH cur INTO p_TotalValue, p_OrderStatus;
+		if done = true then
+        leave processOrder;
+        end if;
+end loop;
+close cur;
 End$$
 Delimiter ;
+CALL calculatingOrder('O20001', @total_value, @order_status);
+select @total_value,@order_status;
 
 
